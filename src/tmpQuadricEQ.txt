@@ -1,0 +1,205 @@
+public double[] preCompConstVals(double a, double b, double c, double d, double e, double f, double g, double h, double i, double j){
+	double[] result = new double[39];
+
+	result[sAB] = a * b;
+	result[sAC] = a * c;
+	result[dAB] = 2 * a * b;
+	result[dAC] = 2 * a * c;
+	result[dAF] = 2 * a * f;
+	result[dAH] = 2 * a * h;
+	result[dAI] = 2 * a * i;
+	result[sBC] = b * c;
+	result[dBC] = 2 * b * c;
+	result[dBE] = 2 * b * e;
+	result[dBG] = 2 * b * g;
+	result[dBI] = 2 * b * i;
+	result[dCD] = 2 * c * d;
+	result[dCG] = 2 * c * g;
+	result[dCH] = 2 * c * h;
+	result[sDD] = d * d;
+	result[dDD] = 2 * d * d;
+	result[dDE] = 2 * d * e;
+	result[dDF] = 2 * d * f;
+	result[dDG] = 2 * d * g;
+	result[dDH] = 2 * d * h;
+	result[dDI] = 2 * d * i;
+	result[dDJ] = 2 * d * j;
+	result[sEE] = e * e;
+	result[dEE] = 2 * e * e;
+	result[dEF] = 2 * e * f;
+	result[dEG] = 2 * e * g;
+	result[dEH] = 2 * e * h;
+	result[dEI] = 2 * e * i;
+	result[dEJ] = 2 * e * j;
+	result[sFF] = f * f;
+	result[dFF] = 2 * f * f;
+	result[dFG] = 2 * f * g;
+	result[dFH] = 2 * f * h;
+	result[dFI] = 2 * f * i;
+	result[dFJ] = 2 * f * j;
+	result[sGG] = g * g;
+	result[dGH] = 2 * g * h;
+	result[dGI] = 2 * g * i;
+
+	return result;
+
+}//precompute quadric constants 
+
+
+//1st tier substitution vars
+double x_00 = x0 * x0;
+double x_CC = xC * xC;
+double x_CD = xC * xD;
+double x_DD = xD * xD;
+double x_0C = x0 * xC;
+double x_0D = x0 * xD;
+
+double x_Dz_D = xD * zD;
+
+double x_0y_0 = x0 * y0;
+double x_0y_C = x0 * yC;
+double x_0y_D = x0 * yD;
+
+double x_Cy_0 = xC * y0;
+double x_Cy_C = xC * yC;
+double x_Cy_D = xC * yD;
+
+double x_Dy_0 = xD * y0;
+double x_Dy_C = xD * yC;
+double x_Dy_D = xD * yD;
+
+double y_00 = y0 * y0;
+double y_0C = y0 * yC;
+double y_CC = yC * yC;
+double y_CD = yC * yD;
+double y_DD = yD * yD;
+
+double y_0z_0 = y0 * z0;
+double y_0z_C = y0 * zC;
+double y_0z_D = y0 * zD;
+
+double y_Cz_0 = yC * z0;
+double y_Cz_C = yC * zC;
+double y_Cz_D = yC * zD;
+
+double y_Dz_0 = yD * z0;
+double y_Dz_C = yD * zC;
+double y_Dz_D = yD * zD;
+
+double z_00 = z0 * z0;
+double z_CC = zC * zC;
+double z_CD = zC * zD;
+double z_DD = zD * zD;
+double z_0D = z0 * zD;
+
+
+//2nd tier substitution vars
+
+double x_0y_Dz_D = x0 * y_Dz_D;
+double x_Cy_Dz_D = xC * y_Dz_D;
+
+double x_0y_DD = x0 * y_DD;
+double x_0z_DD = x0 * z_DD;
+
+double x_Cz_DD = xC * z_DD;
+double x_Cy_DD = xC * y_DD;
+double x_Cy_C_y_Dz_D = x_Cy_C * y_Dz_D;
+double x_Cy_C_z_DD = x_Cy_C*z_DD;
+
+double x_Dy_0z_D = xD * y_0z_D;
+double x_Dy_Cz_D = xD * y_Cz_D;
+double x_Dy_Dz_CC = x_Dy_D * z_CC;
+double x_Dy_C_y_Dz_C = x_Dy_C * y_Dz_C;
+
+double x_0D_y_0C = x_0D * y_0C;
+double x_0D_y_CD = x_0D * y_CD;
+
+double x_0D_z_0D = x_0D * z_0D;
+double x_0D_z_CD = x_0D * z_CD;
+double x_0D_y_0z_D = x_0D * y_0z_D;
+
+double x_DD_y_00 = x_DD * y_00;
+double y_00_z_DD = y_00 * z_DD;
+
+
+double x_Dy_0_y_Cz_D = x_Dy_0 * y_Cz_D;
+double x_Dy_0_y_Cz_C = x_Dy_0 * y_Cz_C;
+
+double x_CCy_Dz_D = x_CC * y_Dz_D;
+double yC_y_Dz_D = yC * y_Dz_D;
+
+
+t1 = -(xD*(g + a*x0 - a*xC + d*y0 - d*yC + e*z0 - e*zC) + yD*(h + b*y0 - b*yC + d*x0 - d*xC + f*z0 - f*zC) + zD*(i + c*z0 + e*x0 - c*zC - e*xC + f*y0 - f*yC) 
+     - pow((gAra[sDD]*x_00*y_DD - gAra[dDD]*x_0C*y_DD - gAra[dDD]*x_0D_y_0C + gAra[dDD]*x_0D_y_CD + gAra[sDD]*x_CC*y_DD + gAra[dDD]*x_CD*y_0C 
+     - gAra[dDD]*x_CD*y_CD + gAra[sDD]*x_DD_y_00 - gAra[dDD]*x_DD*y_0C + gAra[sDD]*x_DD*y_CC + gAra[dDE]*x_00*y_Dz_D 
+     - 2*gAra[dDE]*x_0C*y_Dz_D - gAra[dDE]*x_0D_z_CD + gAra[dDE]*x_0D*y_Cz_D - gAra[dDE]*x_0D*y_Dz_0 + gAra[dDE]*x_0D*y_Dz_C 
+     + gAra[dDE]*x_CCy_Dz_D + gAra[dDE]*x_CD*y_0z_D - gAra[dDE]*x_CD*y_Cz_D + gAra[dDE]*x_CD*y_Dz_0 - gAra[dDE]*x_CD*y_Dz_C 
+     + gAra[dDE]*x_DD*y_0z_0 - gAra[dDE]*x_DD*y_0z_C - gAra[dDE]*x_DD*y_Cz_0 + gAra[dDE]*x_DD*y_Cz_C - gAra[dDF]*x_0y_0*y_Cz_D + gAra[dDF]*x_0y_C*y_Dz_D 
+     + gAra[dDF]*x_0y_D*y_Dz_0 - gAra[dDF]*x_0y_D*y_Dz_C + gAra[dDF]*x_Cy_0*y_Cz_D - gAra[dDF]*x_Cy_C_y_Dz_D - gAra[dDF]*x_Cy_D*y_Dz_0 + gAra[dDF]*x_Cy_D*y_Dz_C 
+     + gAra[dDF]*x_Dy_0*y_0z_D - 2*gAra[dDF]*x_Dy_0_y_Cz_D - gAra[dDF]*x_Dy_0*y_Cz_0 + gAra[dDF]*x_Dy_0_y_Cz_C + gAra[dDF]*x_Dy_C*y_Cz_D + gAra[dDF]*x_Dy_C*y_Dz_0 
+     - gAra[dDF]*x_Dy_C_y_Dz_C - gAra[dDG]*x_0D*yD + gAra[dDG]*x_CD*yD + gAra[dDG]*x_DD*y0 - gAra[dDG]*x_DD*yC + gAra[dDH]*x_0y_DD - gAra[dDH]*x_Cy_DD 
+     - gAra[dDH]*x_Dy_0*yC + gAra[dDH]*x_Dy_C*yD + gAra[dDI]*x_0y_Dz_D - gAra[dDI]*x_Cy_Dz_D + gAra[dDI]*x_Dy_0z_D - gAra[dDI]*x_Dy_Cz_D - 2*gAra[dDI]*xD*y_Dz_0 
+     + 2*gAra[dDI]*xD*y_Dz_C - gAra[dCD]*x_0y_0*z_DD + gAra[dCD]*x_0y_C*z_DD + gAra[dCD]*x_0y_D*z_0D - gAra[dCD]*x_0y_D*z_CD + gAra[dCD]*x_Cy_0*z_DD 
+     - gAra[dCD]*x_Cy_C_z_DD - gAra[dCD]*x_Cy_D*z_0D + gAra[dCD]*x_Cy_D*z_CD + gAra[dCD]*x_Dy_0*z_0D - gAra[dCD]*x_Dy_0*z_CD - gAra[dCD]*x_Dy_C*z_0D 
+     + gAra[dCD]*x_Dy_C*z_CD - gAra[dCD]*xD*yD*z_00 + 2*gAra[dCD]*xD*y_Dz_0*zC - gAra[dCD]*x_Dy_Dz_CC - gAra[dDJ]*x_Dy_D + sEE*x_00*z_DD - gAra[dEE]*x_0C*z_DD 
+     - gAra[dEE]*x_0D_z_0D + gAra[dEE]*x_0D_z_CD + sEE*x_CC*z_DD + gAra[dEE]*x_CD*z_0D - gAra[dEE]*x_CD*z_CD + sEE*x_DD*z_00 - gAra[dEE]*x_DD*z0*zC 
+     + sEE*x_DD*z_CC + gAra[dEF]*x_0y_0*z_DD - gAra[dEF]*x_0y_C*z_DD - gAra[dEF]*x_0y_D*z_0D + gAra[dEF]*x_0y_D*z_CD - gAra[dEF]*x_Cy_0*z_DD + gAra[dEF]*x_Cy_C_z_DD 
+     + gAra[dEF]*x_Cy_D*z_0D - gAra[dEF]*x_Cy_D*z_CD - gAra[dEF]*x_Dy_0*z_0D + gAra[dEF]*x_Dy_0*z_CD + gAra[dEF]*x_Dy_C*z_0D - gAra[dEF]*x_Dy_C*z_CD 
+     + gAra[dEF]*xD*yD*z_00 - 2*gAra[dEF]*xD*y_Dz_0*zC + gAra[dEF]*x_Dy_Dz_CC - gAra[dEG]*x_0D*zD + gAra[dEG]*x_CD*zD + gAra[dEG]*x_DD*z0 - gAra[dEG]*x_DD*zC 
+     + gAra[dEH]*x_0y_Dz_D - gAra[dEH]*x_Cy_Dz_D - 2*gAra[dEH]*x_Dy_0z_D + 2*gAra[dEH]*x_Dy_Cz_D + gAra[dEH]*xD*y_Dz_0 - gAra[dEH]*xD*y_Dz_C + gAra[dEI]*x_0z_DD 
+     - gAra[dEI]*x_Cz_DD - gAra[dEI]*xD*z_0D + gAra[dEI]*xD*z_CD + gAra[dBE]*x_0y_0*y_Cz_D - gAra[dBE]*x_0y_C*y_Dz_D - gAra[dBE]*x_0y_D*y_Dz_0 + gAra[dBE]*x_0y_D*y_Dz_C 
+     - gAra[dBE]*x_Cy_0*y_Cz_D + gAra[dBE]*x_Cy_C_y_Dz_D + gAra[dBE]*x_Cy_D*y_Dz_0 - gAra[dBE]*x_Cy_D*y_Dz_C - gAra[dBE]*x_Dy_0*y_0z_D + 2*gAra[dBE]*x_Dy_0_y_Cz_D 
+     + gAra[dBE]*x_Dy_0*y_Cz_0 - gAra[dBE]*x_Dy_0_y_Cz_C - gAra[dBE]*x_Dy_C*y_Cz_D - gAra[dBE]*x_Dy_C*y_Dz_0 + gAra[dBE]*x_Dy_C_y_Dz_C - gAra[dEJ]*x_Dz_D 
+     + gAra[sFF]*y_00_z_DD - gAra[dFF]*y_0C*z_DD - gAra[dFF]*y_0C*z_0D + gAra[dFF]*y_0C*z_CD + gAra[sFF]*y_CC*z_DD + gAra[dFF]*y_CD*z_0D 
+     - gAra[dFF]*y_CD*z_CD + gAra[sFF]*y_DD*z_00 - gAra[dFF]*y_DD*z_0C + gAra[sFF]*y_DD*z_CC - 2*gAra[dFG]*x_0y_Dz_D + 2*gAra[dFG]*x_Cy_Dz_D 
+     + gAra[dFG]*x_Dy_0z_D - gAra[dFG]*x_Dy_Cz_D + gAra[dFG]*xD*y_Dz_0 - gAra[dFG]*xD*y_Dz_C - gAra[dFH]*y0*y_Cz_D + gAra[dFH]*yC_y_Dz_D 
+     + gAra[dFH]*yD*y_Dz_0 - gAra[dFH]*yD*y_Dz_C + gAra[dFI]*y0*z_DD - gAra[dFI]*yC*z_DD - gAra[dFI]*yD*z_0D + gAra[dFI]*yD*z_CD - gAra[dAF]*x_00*y_Dz_D 
+     + 2*gAra[dAF]*x_0C*y_Dz_D + gAra[dAF]*x_0D_z_CD - gAra[dAF]*x_0D*y_Cz_D + gAra[dAF]*x_0D*y_Dz_0 - gAra[dAF]*x_0D*y_Dz_C - gAra[dAF]*x_CCy_Dz_D 
+     - gAra[dAF]*x_CD*y_0z_D + gAra[dAF]*x_CD*y_Cz_D - gAra[dAF]*x_CD*y_Dz_0 + gAra[dAF]*x_CD*y_Dz_C - gAra[dAF]*x_DD*y_0z_0 + gAra[dAF]*x_DD*y_0z_C 
+     + gAra[dAF]*x_DD*y_Cz_0 - gAra[dAF]*x_DD*y_Cz_C - gAra[dFJ]*y_Dz_D + gAra[sGG]*x_DD + gAra[dGH]*x_Dy_D + gAra[dGI]*x_Dz_D - gAra[dBG]*x_0y_DD - gAra[dCG]*x_0z_DD 
+     + gAra[dBG]*x_Cy_DD + gAra[dCG]*x_Cz_DD + gAra[dBG]*x_Dy_0*yC - gAra[dBG]*x_Dy_C*yD + gAra[dCG]*xD*z_0D - gAra[dCG]*xD*z_CD + h*h*y_DD + 2*h*i*y_Dz_D 
+     + 2*gAra[dAH]*x_0D*yD - 2*gAra[dAH]*x_CD*yD - 2*gAra[dAH]*x_DD*y0 + 2*gAra[dAH]*x_DD*yC - gAra[dCH]*y0*z_DD + gAra[dCH]*yC*z_DD + gAra[dCH]*yD*z_0D - gAra[dCH]*yD*z_CD 
+     + i*i*z_DD + gAra[dAI]*x_0D*zD - gAra[dAI]*x_CD*zD - gAra[dAI]*x_DD*z0 + gAra[dAI]*x_DD*zC + gAra[dBI]*y0*y_Cz_D - gAra[dBI]*yC_y_Dz_D - gAra[dBI]*yD*y_Dz_0 
+     + gAra[dBI]*yD*y_Dz_C - gAra[sAB]*x_00*y_DD - gAra[sAC]*x_00*z_DD + gAra[dAB]*x_0C*y_DD + gAra[dAC]*x_0C*z_DD + gAra[dAB]*x_0D_y_0C - gAra[dAB]*x_0D_y_CD
+     + gAra[dAC]*x_0D_z_0D - gAra[dAC]*x_0D_z_CD - gAra[sAB]*x_CC*y_DD - gAra[sAC]*x_CC*z_DD - gAra[dAB]*x_CD*y_0C + gAra[dAB]*x_CD*y_CD - gAra[dAC]*x_CD*z_0D 
+     + gAra[dAC]*x_CD*z_CD - gAra[sAB]*x_DD_y_00 + gAra[dAB]*x_DD*y_0C - gAra[sAB]*x_DD*y_CC - gAra[sAC]*x_DD*z_00 + gAra[dAC]*x_DD*z0*zC - gAra[sAC]*x_DD*z_CC - a*j*x_DD
+     - gAra[sBC]*y_00_z_DD + gAra[dBC]*y_0C*z_DD + gAra[dBC]*y_0C*z_0D - gAra[dBC]*y_0C*z_CD - gAra[sBC]*y_CC*z_DD - gAra[dBC]*y_CD*z_0D + gAra[dBC]*y_CD*z_CD 
+     - gAra[sBC]*y_DD*z_00 + gAra[dBC]*y_DD*z_0C - gAra[sBC]*y_DD*z_CC - b*j*y_DD - c*j*z_DD),.5))
+     /
+     (a*x_DD + 2*d*x_Dy_D + 2*e*x_Dz_D + b*y_DD + 2*f*y_Dz_D + c*z_DD);
+    
+     t2 = -(xD*(g + a*x0 - a*xC + d*y0 - d*yC + e*z0 - e*zC) + yD*(h + b*y0 - b*yC + d*x0 - d*xC + f*z0 - f*zC) + zD*(i + c*z0 + e*x0 - c*zC - e*xC + f*y0 - f*yC) 
+     + pow((gAra[sDD]*x_00*y_DD - gAra[dDD]*x_0C*y_DD - gAra[dDD]*x_0D_y_0C + gAra[dDD]*x_0D_y_CD + gAra[sDD]*x_CC*y_DD + gAra[dDD]*x_CD*y_0C 
+     - gAra[dDD]*x_CD*y_CD + gAra[sDD]*x_DD_y_00 - gAra[dDD]*x_DD*y_0C + gAra[sDD]*x_DD*y_CC + gAra[dDE]*x_00*y_Dz_D 
+     - 2*gAra[dDE]*x_0C*y_Dz_D - gAra[dDE]*x_0D_z_CD + gAra[dDE]*x_0D*y_Cz_D - gAra[dDE]*x_0D*y_Dz_0 + gAra[dDE]*x_0D*y_Dz_C 
+     + gAra[dDE]*x_CCy_Dz_D + gAra[dDE]*x_CD*y_0z_D - gAra[dDE]*x_CD*y_Cz_D + gAra[dDE]*x_CD*y_Dz_0 - gAra[dDE]*x_CD*y_Dz_C 
+     + gAra[dDE]*x_DD*y_0z_0 - gAra[dDE]*x_DD*y_0z_C - gAra[dDE]*x_DD*y_Cz_0 + gAra[dDE]*x_DD*y_Cz_C - gAra[dDF]*x_0y_0*y_Cz_D + gAra[dDF]*x_0y_C*y_Dz_D 
+     + gAra[dDF]*x_0y_D*y_Dz_0 - gAra[dDF]*x_0y_D*y_Dz_C + gAra[dDF]*x_Cy_0*y_Cz_D - gAra[dDF]*x_Cy_C_y_Dz_D - gAra[dDF]*x_Cy_D*y_Dz_0 + gAra[dDF]*x_Cy_D*y_Dz_C + gAra[dDF]*x_Dy_0*y_0z_D 
+     - 2*gAra[dDF]*x_Dy_0_y_Cz_D - gAra[dDF]*x_Dy_0*y_Cz_0 + gAra[dDF]*x_Dy_0_y_Cz_C + gAra[dDF]*x_Dy_C*y_Cz_D + gAra[dDF]*x_Dy_C*y_Dz_0 - gAra[dDF]*x_Dy_C_y_Dz_C - gAra[dDG]*x_0D*yD 
+     + gAra[dDG]*x_CD*yD + gAra[dDG]*x_DD*y0 - gAra[dDG]*x_DD*yC + gAra[dDH]*x_0y_DD - gAra[dDH]*x_Cy_DD - gAra[dDH]*x_Dy_0*yC + gAra[dDH]*x_Dy_C*yD + gAra[dDI]*x_0y_Dz_D 
+     - gAra[dDI]*x_Cy_Dz_D + gAra[dDI]*x_Dy_0z_D - gAra[dDI]*x_Dy_Cz_D - 2*gAra[dDI]*xD*y_Dz_0 + 2*gAra[dDI]*xD*y_Dz_C - gAra[dCD]*x_0y_0*z_DD + gAra[dCD]*x_0y_C*z_DD + gAra[dCD]*x_0y_D*z_0D
+     - gAra[dCD]*x_0y_D*z_CD + gAra[dCD]*x_Cy_0*z_DD - gAra[dCD]*x_Cy_C_z_DD - gAra[dCD]*x_Cy_D*z_0D + gAra[dCD]*x_Cy_D*z_CD + gAra[dCD]*x_Dy_0*z_0D - gAra[dCD]*x_Dy_0*z_CD 
+     - gAra[dCD]*x_Dy_C*z_0D + gAra[dCD]*x_Dy_C*z_CD - gAra[dCD]*xD*yD*z_00 + 2*gAra[dCD]*xD*y_Dz_0*zC - gAra[dCD]*x_Dy_Dz_CC - gAra[dDJ]*x_Dy_D + sEE*x_00*z_DD - gAra[dEE]*x_0C*z_DD 
+     - gAra[dEE]*x_0D_z_0D + gAra[dEE]*x_0D_z_CD + sEE*x_CC*z_DD + gAra[dEE]*x_CD*z_0D - gAra[dEE]*x_CD*z_CD + sEE*x_DD*z_00 - gAra[dEE]*x_DD*z0*zC + sEE*x_DD*z_CC 
+     + gAra[dEF]*x_0y_0*z_DD - gAra[dEF]*x_0y_C*z_DD - gAra[dEF]*x_0y_D*z_0D + gAra[dEF]*x_0y_D*z_CD - gAra[dEF]*x_Cy_0*z_DD + gAra[dEF]*x_Cy_C_z_DD + gAra[dEF]*x_Cy_D*z_0D 
+     - gAra[dEF]*x_Cy_D*z_CD - gAra[dEF]*x_Dy_0*z_0D + gAra[dEF]*x_Dy_0*z_CD + gAra[dEF]*x_Dy_C*z_0D - gAra[dEF]*x_Dy_C*z_CD + gAra[dEF]*xD*yD*z_00 - 2*gAra[dEF]*xD*y_Dz_0*zC 
+     + gAra[dEF]*x_Dy_Dz_CC - gAra[dEG]*x_0D*zD + gAra[dEG]*x_CD*zD + gAra[dEG]*x_DD*z0 - gAra[dEG]*x_DD*zC + gAra[dEH]*x_0y_Dz_D - gAra[dEH]*x_Cy_Dz_D - 2*gAra[dEH]*x_Dy_0z_D 
+     + 2*gAra[dEH]*x_Dy_Cz_D + gAra[dEH]*xD*y_Dz_0 - gAra[dEH]*xD*y_Dz_C + gAra[dEI]*x_0z_DD - gAra[dEI]*x_Cz_DD - gAra[dEI]*xD*z_0D + gAra[dEI]*xD*z_CD + gAra[dBE]*x_0y_0*y_Cz_D
+     - gAra[dBE]*x_0y_C*y_Dz_D - gAra[dBE]*x_0y_D*y_Dz_0 + gAra[dBE]*x_0y_D*y_Dz_C - gAra[dBE]*x_Cy_0*y_Cz_D + gAra[dBE]*x_Cy_C_y_Dz_D + gAra[dBE]*x_Cy_D*y_Dz_0 - gAra[dBE]*x_Cy_D*y_Dz_C
+     - gAra[dBE]*x_Dy_0*y_0z_D + 2*gAra[dBE]*x_Dy_0_y_Cz_D + gAra[dBE]*x_Dy_0*y_Cz_0 - gAra[dBE]*x_Dy_0_y_Cz_C - gAra[dBE]*x_Dy_C*y_Cz_D - gAra[dBE]*x_Dy_C*y_Dz_0 + gAra[dBE]*x_Dy_C_y_Dz_C 
+     - gAra[dEJ]*x_Dz_D + gAra[sFF]*y_00_z_DD - gAra[dFF]*y_0C*z_DD - gAra[dFF]*y_0C*z_0D + gAra[dFF]*y_0C*z_CD + gAra[sFF]*y_CC*z_DD + gAra[dFF]*y_CD*z_0D - gAra[dFF]*y_CD*z_CD 
+     + gAra[sFF]*y_DD*z_00 - gAra[dFF]*y_DD*z_0C + gAra[sFF]*y_DD*z_CC - 2*gAra[dFG]*x_0y_Dz_D + 2*gAra[dFG]*x_Cy_Dz_D + gAra[dFG]*x_Dy_0z_D - gAra[dFG]*x_Dy_Cz_D + gAra[dFG]*xD*y_Dz_0 
+     - gAra[dFG]*xD*y_Dz_C - gAra[dFH]*y0*y_Cz_D + gAra[dFH]*yC_y_Dz_D + gAra[dFH]*yD*y_Dz_0 - gAra[dFH]*yD*y_Dz_C + gAra[dFI]*y0*z_DD - gAra[dFI]*yC*z_DD - gAra[dFI]*yD*z_0D
+     + gAra[dFI]*yD*z_CD - gAra[dAF]*x_00*y_Dz_D + 2*gAra[dAF]*x_0C*y_Dz_D + gAra[dAF]*x_0D_z_CD - gAra[dAF]*x_0D*y_Cz_D + gAra[dAF]*x_0D*y_Dz_0 - gAra[dAF]*x_0D*y_Dz_C
+     - gAra[dAF]*x_CCy_Dz_D - gAra[dAF]*x_CD*y_0z_D + gAra[dAF]*x_CD*y_Cz_D - gAra[dAF]*x_CD*y_Dz_0 + gAra[dAF]*x_CD*y_Dz_C - gAra[dAF]*x_DD*y_0z_0 + gAra[dAF]*x_DD*y_0z_C 
+     + gAra[dAF]*x_DD*y_Cz_0 - gAra[dAF]*x_DD*y_Cz_C - gAra[dFJ]*y_Dz_D + gAra[sGG]*x_DD + gAra[dGH]*x_Dy_D + gAra[dGI]*x_Dz_D - gAra[dBG]*x_0y_DD - gAra[dCG]*x_0z_DD + gAra[dBG]*x_Cy_DD
+     + gAra[dCG]*x_Cz_DD + gAra[dBG]*x_Dy_0*yC - gAra[dBG]*x_Dy_C*yD + gAra[dCG]*xD*z_0D - gAra[dCG]*xD*z_CD + h*h*y_DD + 2*h*i*y_Dz_D + 2*gAra[dAH]*x_0D*yD - 2*gAra[dAH]*x_CD*yD 
+     - 2*gAra[dAH]*x_DD*y0 + 2*gAra[dAH]*x_DD*yC - gAra[dCH]*y0*z_DD + gAra[dCH]*yC*z_DD + gAra[dCH]*yD*z_0D - gAra[dCH]*yD*z_CD + i*i*z_DD + gAra[dAI]*x_0D*zD - gAra[dAI]*x_CD*zD 
+     - gAra[dAI]*x_DD*z0 + gAra[dAI]*x_DD*zC + gAra[dBI]*y0*y_Cz_D - gAra[dBI]*yC_y_Dz_D - gAra[dBI]*yD*y_Dz_0 + gAra[dBI]*yD*y_Dz_C - gAra[sAB]*x_00*y_DD - gAra[sAC]*x_00*z_DD + gAra[dAB]*x_0C*y_DD
+     + gAra[dAC]*x_0C*z_DD + gAra[dAB]*x_0D_y_0C - gAra[dAB]*x_0D_y_CD + gAra[dAC]*x_0D_z_0D - gAra[dAC]*x_0D_z_CD - gAra[sAB]*x_CC*y_DD - gAra[sAC]*x_CC*z_DD 
+     - gAra[dAB]*x_CD*y_0C + gAra[dAB]*x_CD*y_CD - gAra[dAC]*x_CD*z_0D + gAra[dAC]*x_CD*z_CD - gAra[sAB]*x_DD_y_00 + gAra[dAB]*x_DD*y_0C - gAra[sAB]*x_DD*y_CC 
+     - gAra[sAC]*x_DD*z_00 + gAra[dAC]*x_DD*z0*zC - gAra[sAC]*x_DD*z_CC - a*j*x_DD - gAra[sBC]*y_00_z_DD + gAra[dBC]*y_0C*z_DD + gAra[dBC]*y_0C*z_0D - gAra[dBC]*y_0C*z_CD
+     - gAra[sBC]*y_CC*z_DD - gAra[dBC]*y_CD*z_0D + gAra[dBC]*y_CD*z_CD - gAra[sBC]*y_DD*z_00 + gAra[dBC]*y_DD*z_0C - gAra[sBC]*y_DD*z_CC - b*j*y_DD - c*j*z_DD),.5))
+     /
+     (a*x_DD + 2*d*x_Dy_D + 2*e*x_Dz_D + b*y_DD + 2*f*y_Dz_D + c*z_DD);
+ 
