@@ -79,7 +79,15 @@ public class DistRayTracer extends PApplet {
 
 	//photon kd tree stuff
 	public double photon_radius = 2;
-	
+	public static void main(String[] passedArgs) {		
+		String[] appletArgs = new String[] { "rayTracerDistAccelShdPhtnMap.DistRayTracer" };
+		    if (passedArgs != null) {
+		    	PApplet.main(PApplet.concat(appletArgs, passedArgs));
+		    } else {
+		    	PApplet.main(appletArgs);
+		    }
+	}//main
+
 	public void settings(){	size(sceneCols,sceneRows, P3D);	}	
 	public void setup() {
 		colorMode(RGB, 1.0f);
