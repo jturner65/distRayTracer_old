@@ -84,7 +84,7 @@ class myImageTexture extends myTextureHandler{
 	protected double[] getTextureColor(rayHit hit, PImage myTexture){
   		double [] texColor = new double[3];
   		
-  		double[] tCoords = hit.obj.findTxtrCoords(hit.hitLoc, myTexture, hit.transRay.time);
+  		double[] tCoords = hit.obj.findTxtrCoords(hit.hitLoc, myTexture, hit.transRay.getTime());
   		double v = tCoords[1],u = tCoords[0];
   		//texColorRC - R is row(v), C is column(u)
   		

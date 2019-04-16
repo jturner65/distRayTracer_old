@@ -78,7 +78,7 @@ public abstract class myScene {
 		simpleRefrIDX		= 4,		//whether scene should use simplified refraction (intended to minimize refactorization requirement in mySceneObject)
 		
 		flipNormsIDX		= 5,		//whether or not we should flip the normal directions in this scene
-		hasDoFIDX			= 6,		//using depth of field
+		hasDpthOfFldIDX			= 6,		//using depth of field
 		showObjInfoIDX 		= 7,		//print out object info after rendering image
 		addToTmpListIDX		= 8,		//add object to the temp list, so that the objects will be added to some accel structure.
 		timeRndrIDX			= 9,		//time the length of rendering and display the results.
@@ -160,7 +160,7 @@ public abstract class myScene {
 	///////
 	//transformation stack stuff
 	//
-	public gtStack matrixStack;
+	public myMatStack matrixStack;
 	//current depth in matrix stack - starts at 0;
 	public int currMatrixDepthIDX;	
 	
@@ -802,10 +802,10 @@ public abstract class myScene {
 		for(int i =refIDX; i >=0; --i){	RefineIDX[refIDX-i]=p.pow2[i];}
 	}//setRefine
 		
-	public void setDoF(double lRad, double lFD){//depth of field effect
+	public void setDpthOfFld(double lRad, double lFD){//depth of field effect
 		lens_radius = lRad;
 		lens_focal_distance = lFD;
-		scFlags[hasDoFIDX] = true;
+		scFlags[hasDpthOfFldIDX] = true;
 		focalPlane.setPlaneVals(0, 0, 1, lens_focal_distance);      //needs to be modified so that d = viewZ + lens_focal_distance once FOV has been specified.
 	}
 	
@@ -865,7 +865,7 @@ public abstract class myScene {
 	//RT functionality
 	///////	
 	//get random location within "lens" for depth of field calculation - consider loc to be center, pick random point in constant z plane within some radius of loc point
-	public myVector getDofEyeLoc(myVector loc){
+	public myVector getDpthOfFldEyeLoc(myVector loc){
 		myVector tmp = p.rotVecAroundAxis(new myVector(0,1,0),new myVector(0,0,-1),ThreadLocalRandom.current().nextDouble(0,PConstants.TWO_PI));				//rotate surfTangent by random angle
 		tmp._normalize();
 		double mult = ThreadLocalRandom.current().nextDouble(0,lens_radius);			//find displacement radius from origin
@@ -1234,7 +1234,7 @@ public abstract class myScene {
 
 	 public void gtInitialize() {
 		 currMatrixDepthIDX = 0;
-		 matrixStack = new gtStack(this);
+		 matrixStack = new myMatStack(this.matStackMaxHeight);
 		 matrixStack.initStackLocation(0);
 	 }//gtInitialize method
 
@@ -1248,14 +1248,14 @@ public abstract class myScene {
 	public void gtPopMatrix() { 
 		if (matrixStack.top == 0){System.out.println("Error : Cannot pop the last matrix in the matrix stack");} 
 		else {		//temp was last matrix at top of stack - referencing only for debugging purposes
-			gtMatrix temp = matrixStack.pop();
+			myMatrix temp = matrixStack.pop();
 			currMatrixDepthIDX--;
 		}
 	}//gtPopMatrix method
 
 	public void gtTranslate(double tx, double ty, double tz) { 
 		//build and push onto stack the translation matrix
-		gtMatrix TransMat = new gtMatrix();
+		myMatrix TransMat = new myMatrix();
 		//set the 4th column vals to be the translation coordinates
 		TransMat.setValByIdx(0,3,tx);
 		TransMat.setValByIdx(1,3,ty);
@@ -1265,7 +1265,7 @@ public abstract class myScene {
 
 	public void gtScale(double sx, double sy, double sz) {
 		//build and push onto stack the scale matrix
-		gtMatrix ScaleMat = new gtMatrix();
+		myMatrix ScaleMat = new myMatrix();
 		//set the diagonal vals to be the scale coordinates
 		ScaleMat.setValByIdx(0,0,sx);
 		ScaleMat.setValByIdx(1,1,sy);
@@ -1280,10 +1280,10 @@ public abstract class myScene {
 	public void gtRotate(double angle, double ax, double ay, double az) { 
 		// build and add to top of stack the rotation matrix
 		double angleRad = (double)(angle * Math.PI)/180.0;
-		gtMatrix RotMat = new gtMatrix();
-		gtMatrix RotMatrix1 = new gtMatrix();      //translates given axis to x axis
-		gtMatrix RotMatrix2 = new gtMatrix();      //rotation around x axis by given angle
-		gtMatrix RotMatrix1Trans = new gtMatrix();
+		myMatrix RotMat = new myMatrix();
+		myMatrix RotMatrix1 = new myMatrix();      //translates given axis to x axis
+		myMatrix RotMatrix2 = new myMatrix();      //rotation around x axis by given angle
+		myMatrix RotMatrix1Trans = new myMatrix();
 	  
 		myVector axisVect, axisVectNorm, bVect, bVectNorm, cVect, cVectNorm, normVect;
 		//first build rotation matrix to rotate ax,ay,az to lie in line with x axis		
@@ -1312,13 +1312,13 @@ public abstract class myScene {
 		RotMatrix2.setValByIdx(2,2,(Math.cos(angleRad)));
 		//lastly, calculate full rotation matrix
 
-		gtMatrix tmp = RotMatrix2.multMat(RotMatrix1);
+		myMatrix tmp = RotMatrix2.multMat(RotMatrix1);
 		RotMat = RotMatrix1Trans.multMat(tmp);
 		updateCTM(RotMat);
 	}//gtrotate
 	
-	public void updateCTM(gtMatrix _mat){		
-		gtMatrix CTM = matrixStack.peek();
+	public void updateCTM(myMatrix _mat){		
+		myMatrix CTM = matrixStack.peek();
 		matrixStack.replaceTop(CTM.multMat(_mat));
 	}
 	/////
@@ -1374,16 +1374,16 @@ class myFOVScene extends myScene {
 		//virtual view plane exists at some -z so that fov gives sceneCols x sceneRows x and y;-1 for negative z, makes coord system right handed
 		//if depth of field scene, then use lens focal distance as z depth (??)
 		viewZ = -1 *  (Math.max(sceneRows,sceneCols)/2.0)/Math.tan(fovRad/2);
-		if(scFlags[hasDoFIDX]){//depth of field variables already set from reader - build focal plane
+		if(scFlags[hasDpthOfFldIDX]){//depth of field variables already set from reader - build focal plane
 			focalPlane.setPlaneVals(0, 0, 1,  lens_focal_distance);  		
 			System.out.println("View z : " + viewZ  + "\nfocal plane : "+ focalPlane);
 		}
 	}//setSceneParams
 
-	//getDofEyeLoc()
+	//getDpthOfFldEyeLoc()
 	//no anti aliasing for depth of field, instead, first find intersection of ray with focal plane, then 
-	//then find start location of ray via getDofEyeLoc(), and build multiple rays 
-	protected myColor shootMultiDofRays(double pRayX, double pRayY) {
+	//then find start location of ray via getDpthOfFldEyeLoc(), and build multiple rays 
+	protected myColor shootMultiDpthOfFldRays(double pRayX, double pRayY) {
 		myColor result,aaResultColor;
 		double redVal = 0, greenVal = 0, blueVal = 0;//, rayYOffset = sceneRows/2.0, rayXOffset = sceneCols/2.0;
 		myVector lensCtrPoint = new myVector(pRayX,pRayY,viewZ);
@@ -1394,7 +1394,7 @@ class myFOVScene extends myScene {
 		myVector rayOrigin,														//
 			focalPt = hit.hitLoc;
 		for(int rayNum = 0; rayNum < numRaysPerPixel; ++rayNum){
-			rayOrigin = this.getDofEyeLoc(lensCtrPoint);										//get some random pt within the lens to use as the ray's origin
+			rayOrigin = this.getDpthOfFldEyeLoc(lensCtrPoint);										//get some random pt within the lens to use as the ray's origin
 			ray = new myRay(this, rayOrigin, new myVector(rayOrigin, focalPt),0);
 			aaResultColor = reflectRay(ray);
 			redVal += aaResultColor.RGB.x; //(aaResultColor >> 16 & 0xFF)/256.0;//gets red value
@@ -1405,7 +1405,7 @@ class myFOVScene extends myScene {
 		return result;	  
 	}//shootMultiRays	
 	
-	protected void drawDof(){
+	protected void drawDpthOfFld(){
 		if (!scFlags[renderedIDX]){	
 			initRender();
 			//index of currently written pixel
@@ -1426,7 +1426,7 @@ class myFOVScene extends myScene {
 				for (int col = 0; col < sceneCols; col+=stepIter){
 					if(skipPxl){skipPxl = false;continue;}			//skip only 0,0 pxl		
 					rayX = col - rayXOffset;      
-					showColor = shootMultiDofRays(rayX,rayY);
+					showColor = shootMultiDpthOfFldRays(rayX,rayY);
 					pixIDX = writePxlSpan(showColor.getInt(),row,col,stepIter,rndrdImg.pixels);
 					if ((1.0 * pixIDX)/(numPxls) > (progressCount * .02)){System.out.print("-|");progressCount++;}//progressbar  
 				}//for col
@@ -1440,7 +1440,7 @@ class myFOVScene extends myScene {
 		}
 		p.imageMode(PConstants.CORNER);
 		p.image(rndrdImg,0,0);			
-	}//drawDof
+	}//drawDpthOfFld
 	
 	
 	@Override//calculates color based on multiple rays shot into scene
@@ -1479,7 +1479,7 @@ class myFOVScene extends myScene {
 	@Override
 	//distribution draw
 	public void draw(){
-		if(scFlags[hasDoFIDX]){drawDof(); return;}
+		if(scFlags[hasDpthOfFldIDX]){drawDpthOfFld(); return;}
 		if (!scFlags[renderedIDX]){	
 			initRender();
 			//index of currently written pixel

@@ -30,7 +30,7 @@ public abstract class mySceneObject extends myGeomBase{
 	}
 	//determine if shadow ray is a hit or not
 	@Override
-	public int calcShadowHit(myRay _ray, myRay transRay, gtMatrix[] _ctAra, double distToLight){		
+	public int calcShadowHit(myRay _ray, myRay transRay, myMatrix[] _ctAra, double distToLight){		
 		rayHit hitChk = intersectCheck(_ray,transRay,_ctAra);			
 		if (hitChk.isHit && (distToLight - hitChk.t) > scene.p.epsVal){	return 1;}  
 		//if (distToLight - hitChk.t > scene.epsVal){	return 1;}  
@@ -86,7 +86,7 @@ class myRndrdBox extends mySceneObject{
 	@Override
 	public myVector getMinVec() {		return _bbox.getMinVec();}
 	@Override
-	public rayHit intersectCheck(myRay _ray,myRay transRay, gtMatrix[] _ctAra) {return _bbox.intersectCheck(_ray, transRay, _ctAra);	}
+	public rayHit intersectCheck(myRay _ray,myRay transRay, myMatrix[] _ctAra) {return _bbox.intersectCheck(_ray, transRay, _ctAra);	}
 	@Override
 	public myVector getNormalAtPoint(myVector point, int[] args) {return _bbox.getNormalAtPoint(point, args);}
 }
@@ -114,13 +114,13 @@ class myInstance extends myGeomBase{
 	//return vector with minimum x/y/z coords of this object
 	public myVector getMinVec(){return scene.p.getTransformedPt(obj.getMinVec(), obj.CTMara[glblIDX]);}
 	@Override
-	public int calcShadowHit(myRay _ray,myRay _trans, gtMatrix[] _ctAra, double distToLight) {
+	public int calcShadowHit(myRay _ray,myRay _trans, myMatrix[] _ctAra, double distToLight) {
 		return obj.calcShadowHit(_trans, _trans, _ctAra, distToLight);
 	}
 	@Override
 	public myVector getOrigin(double t) {	return scene.p.getTransformedPt(obj.getOrigin(t), obj.CTMara[glblIDX]);}
 	@Override
-	public rayHit intersectCheck(myRay _ray,myRay transRay, gtMatrix[] _ctAra) {
+	public rayHit intersectCheck(myRay _ray,myRay transRay, myMatrix[] _ctAra) {
 		rayHit _hit = obj.intersectCheck(transRay, transRay, _ctAra);		//copy trans ray over so that ctm-transformed accel structs will still register hits appropriately TODO make this better
 		if(useShader){_hit.shdr = shdr;}
 		return _hit;	

@@ -126,7 +126,7 @@ public class DistRayTracer extends PApplet {
 			case '8':  {gCurrentFile = currentDir + "t08.cli"; break;}
 			case '9':  {gCurrentFile = currentDir + "t09.cli"; break;}
 			case '0':  {gCurrentFile = currentDir + "t10.cli"; break;}
-			case '-':  {gCurrentFile = currentDir + "t11.cli"; break;}
+			case '-':  {gCurrentFile = currentDir + "t11.cli"; break;}		//cornell box
 			
 		    case '!':  {gCurrentFile = currentDir + "p4_st01.cli"; break;}		//worley textures on spheres
 		    case '@':  {gCurrentFile = currentDir + "p4_st02.cli"; break;}
@@ -326,7 +326,7 @@ public class DistRayTracer extends PApplet {
 
 	// To remove the need for index wrapping, double the permutation table length
 	public int perm[] = new int[512];
-	public void initialize_table() { for(int i=0; i<512; i++) perm[i]=p[i & 255];}
+	public void initialize_table() { for(int i=0; i<512; ++i) perm[i]=p[i & 255];}
 	// This method is a *lot* faster than using (int)Math.floor(x)
 	public int fastfloor(float x) { return x>0 ? (int)x : (int)x-1;}
 	public int fastfloor(double x) { return x>0 ? (int)x : (int)x-1;}
@@ -386,7 +386,7 @@ public class DistRayTracer extends PApplet {
 	}
 
 	//expand bbox to encompass passed box
-	public void expandBoxByBox(myBBox tarBox, myBBox srcBox, gtMatrix fwdTrans) {
+	public void expandBoxByBox(myBBox tarBox, myBBox srcBox, myMatrix fwdTrans) {
 		expandBoxPt(tarBox, getTransformedPt(srcBox.minVals,fwdTrans));
 		expandBoxPt(tarBox, getTransformedPt(srcBox.maxVals,fwdTrans));
 	}
@@ -409,25 +409,25 @@ public class DistRayTracer extends PApplet {
 													((tarBox.minVals.z < pt.z) && ( pt.z < tarBox.maxVals.z)));}
 
 	//get transformed/inverse transformed point - homogeneous coords
-	public myVector getTransformedPt(myVector pt, gtMatrix trans){
+	public myVector getTransformedPt(myVector pt, myMatrix trans){
 		double[] newPtAra = trans.multVert(new double[]{pt.x, pt.y, pt.z, 1});	
 		myVector newPt = new myVector(newPtAra[0],newPtAra[1],newPtAra[2]);
 		return newPt;
 	}	
 	//get transformed/inverse transformed vector - homogeneous coords
-	public myVector getTransformedVec(myVector vec, gtMatrix trans){
+	public myVector getTransformedVec(myVector vec, myMatrix trans){
 		double[] newVecAra = trans.multVert(new double[]{vec.x, vec.y, vec.z, 0});		
 		myVector newVec = new myVector(newVecAra[0],newVecAra[1],newVecAra[2]);
 		return newVec;
 	}	
 	//inv mat idx : 1; transpose mat idx : 2; adjoint mat idx : 3
-	private gtMatrix[] buildMatExt(gtMatrix[] CTMara){CTMara[1] = CTMara[0].inverse();CTMara[2] = CTMara[0].transpose();CTMara[3] = CTMara[1].transpose();return CTMara;}
+	private myMatrix[] buildMatExt(myMatrix[] CTMara){CTMara[1] = CTMara[0].inverse();CTMara[2] = CTMara[0].transpose();CTMara[3] = CTMara[1].transpose();return CTMara;}
 	//passing Mat so that can instance transformed prims like distorted spheres
-	public gtMatrix[] buildCTMara(myScene scene, gtMatrix _mat){gtMatrix[] CTMara = new gtMatrix[4];CTMara[0] = _mat.multMat(scene.matrixStack.peek());return buildMatExt(CTMara);}	
+	public myMatrix[] buildCTMara(myScene scene, myMatrix _mat){myMatrix[] CTMara = new myMatrix[4];CTMara[0] = _mat.multMat(scene.matrixStack.peek());return buildMatExt(CTMara);}	
 	//rebuild mat ara such that passed matrix _mat1 to be fwd transformed by _baseMat.  
-	public gtMatrix[] reBuildCTMara(gtMatrix _mat1, gtMatrix _prntMat){gtMatrix[] CTMara = new gtMatrix[4];CTMara[0] = _prntMat.multMat(_mat1);return buildMatExt(CTMara);}	
-	public gtMatrix[] buildCTMara(myScene scene){gtMatrix[] CTMara = new gtMatrix[4];CTMara[0] = scene.matrixStack.peek(); return buildMatExt(CTMara);}	
-	public gtMatrix[] buildIdentCTMara(){gtMatrix[] CTMara = new gtMatrix[4];CTMara[0] = new gtMatrix(); return buildMatExt(CTMara);	}
+	public myMatrix[] reBuildCTMara(myMatrix _mat1, myMatrix _prntMat){myMatrix[] CTMara = new myMatrix[4];CTMara[0] = _prntMat.multMat(_mat1);return buildMatExt(CTMara);}	
+	public myMatrix[] buildCTMara(myScene scene){myMatrix[] CTMara = new myMatrix[4];CTMara[0] = scene.matrixStack.peek(); return buildMatExt(CTMara);}	
+	public myMatrix[] buildIdentCTMara(){myMatrix[] CTMara = new myMatrix[4];CTMara[0] = new myMatrix(); return buildMatExt(CTMara);	}
 	
 	
 	//returns idx (0-2) of coord of max variance in array of arraylists for bvh
@@ -554,4 +554,4 @@ public class DistRayTracer extends PApplet {
 		}//switch
 	}//getClr
 
-}//rayParser class
+}//DistRayTracer class

@@ -17,7 +17,7 @@ public abstract class myImpObject extends mySceneObject {
 	*  for seperate axes radii
 	*/	
 	public myVector originRadCalc(myRay ray){//need to get ray time value
-	    myVector result = new myVector(), _rayOrigin = ray.origin, thisOrigin = getOrigin(ray.time);
+	    myVector result = new myVector(), _rayOrigin = ray.origin, thisOrigin = getOrigin(ray.getTime());
 	    result.set((_rayOrigin.x - thisOrigin.x)/radX, (_rayOrigin.y - thisOrigin.y)/radY, (_rayOrigin.z - thisOrigin.z)/radZ);
 	    return result;  
 	}//method originRadCalc
@@ -73,7 +73,7 @@ class mySphere extends myImpObject{
     return result;
 	}//method getNormalAtPoint	
 	//check if the passed ray intersects with this sphere
-	public rayHit intersectCheck(myRay _ray, myRay transRay, gtMatrix[] _ctAra){
+	public rayHit intersectCheck(myRay _ray, myRay transRay, myMatrix[] _ctAra){
 //		if(!_bbox.intersectCheck(ray, _ctAra).isHit){return new rayHit(false);	}
 //		myRay transRay = ray.getTransformedRay(ray, _ctAra[invIDX]);
 		//boolean result = false;
@@ -171,7 +171,7 @@ class myHollow_Cylinder extends myImpObject{
 	}
 	 
 	//check if passed ray intersects with this cylinder - first using x/z for circular intersection, then planar intersection with end caps, then check which is closest and positive  
-	public rayHit intersectCheck(myRay _ray, myRay transRay, gtMatrix[] _ctAra){		
+	public rayHit intersectCheck(myRay _ray, myRay transRay, myMatrix[] _ctAra){		
 		double a = getAVal(transRay), b = getBVal(transRay), c = getCVal(transRay), discr = ((b*b) - (4*a*c));
 		//quadratic - check first if imaginary - if so then no intersection
 		if (!(discr < 0)){//real roots exist - means ray hits x-z walls somewhere
@@ -256,7 +256,7 @@ class myCylinder extends myHollow_Cylinder{
 	}
  
 	//check if passed ray intersects with this cylinder - first using x/z for circular intersection, then planar intersection with end caps, then check which is closest and positive  
-	public rayHit intersectCheck(myRay _ray, myRay transRay, gtMatrix[] _ctAra){
+	public rayHit intersectCheck(myRay _ray, myRay transRay, myMatrix[] _ctAra){
 		
 		double a = getAVal(transRay),b = getBVal(transRay), c = getCVal(transRay);
 		double discr = ((b*b) - (4*a*c));
@@ -378,7 +378,7 @@ class myTorus extends myImpObject{
 		return null;
 	}
 	@Override
-	public rayHit intersectCheck(myRay _ray, myRay transRay, gtMatrix[] _ctAra){
+	public rayHit intersectCheck(myRay _ray, myRay transRay, myMatrix[] _ctAra){
 //		if(!_bbox.intersectCheck(ray, _ctAra).isHit){return new rayHit(false);	}
 //		myRay transRay = ray.getTransformedRay(ray, _ctAra[invIDX]);
 

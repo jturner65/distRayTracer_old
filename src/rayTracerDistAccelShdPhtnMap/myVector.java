@@ -62,10 +62,10 @@ public class myVector{
 
 }//myVector
 
-class gtMatrix {	  
+class myMatrix {	  
 	public double[][] m;
 	
-	public gtMatrix(){  m = new double[4][4]; initMat();}	
+	public myMatrix(){  m = new double[4][4]; initMat();}	
 	public void initMat(){  this.initMat(false);}	
 	//initialize this matrix to be identity matrix
 	//clear= true gives all 0's | clear= false gives identity
@@ -73,9 +73,9 @@ class gtMatrix {
 	
 	//multiplies this matrix by b, in order: [this] x [b]
 	//returns result in result
-	public gtMatrix multMat(gtMatrix b){
+	public myMatrix multMat(myMatrix b){
 		double resultVal = 0;
-		gtMatrix result = new gtMatrix();
+		myMatrix result = new myMatrix();
 		for (int row = 0; row < 4; ++row){for (int col = 0; col < 4; ++col){for (int k = 0; k < 4; k++){resultVal += this.m[row][k] * b.getValByIdx(k,col);}result.setValByIdx(row,col,resultVal); resultVal = 0;}}
 		return result;  
 	}//mult method
@@ -90,30 +90,30 @@ class gtMatrix {
 	}//mult method
 	
 	//returns the transpose of this matrix - also inverse if rotation matrix
-	public gtMatrix transpose(){ 
-		gtMatrix result = new gtMatrix();
+	public myMatrix transpose(){ 
+		myMatrix result = new myMatrix();
 		for (int row = 0; row < 4; ++row){for (int col = 0; col < 4; ++col){result.m[col][row] = this.m[row][col];}}
 		return result;   
 	}//transpose method
 
-	public gtMatrix inverse(){
-		gtMatrix result = this.InvertMe();
+	public myMatrix inverse(){
+		myMatrix result = this.InvertMe();
 	  return result;    
 	}//method invert
-	public gtMatrix adjoint(){
-		gtMatrix result = this.InvertMe();
+	public myMatrix adjoint(){
+		myMatrix result = this.InvertMe();
 		
 		return result.transpose();
 	}
 	
 	//------------- inversion code
 	
-	private gtMatrix InvertMe(){
+	private myMatrix InvertMe(){
 		double[] tmp = new double[12];   // temp array for pairs
 		double[] src = new double[16];   // array of transpose source matrix
 		double[] dst = new double[16];   //destination matrix, in array form
 		double det = 0;       // determinant 
-		gtMatrix dstMat = new gtMatrix();
+		myMatrix dstMat = new myMatrix();
 		//convert this matrix to array form and set up source vector
 		for(int row = 0; row < 4; ++row){ for(int col = 0; col < 4; ++col){ src[(4*col) + row] = this.m[row][col];	}}
 		
@@ -203,8 +203,8 @@ class gtMatrix {
 	public void setValByRow(int row, myVector vect){ this.m[row][0] = vect.x; this.m[row][1] = vect.y;      this.m[row][2] = vect.z; }//setValByRow
 	 
 	//makes a deep copy of this matrix, which it returns
-	public gtMatrix clone(){
-		gtMatrix newMat = new gtMatrix();
+	public myMatrix clone(){
+		myMatrix newMat = new myMatrix();
 		for (int row = 0; row < 4; ++row){ for (int col = 0; col < 4; ++col){newMat.m[row][col] = this.m[row][col];}}
 		return newMat;
 	}
@@ -222,26 +222,26 @@ class gtMatrix {
   
 }//class matrix
 
-class gtStack {
-	gtMatrix[] s;
+class myMatStack {
+	myMatrix[] s;
 	int top;
 	 
-	public gtStack(myScene _p){
-		s = new gtMatrix[_p.matStackMaxHeight];
-		for (int row = 0; row < 10; row++){s[row] = new gtMatrix();}  	
+	public myMatStack(int matStackMaxHeight){
+		s = new myMatrix[matStackMaxHeight];
+		for (int row = 0; row < 10; ++row){s[row] = new myMatrix();}  	
 		top = 0;        //point top of stack at index of base matrix
 	}//stack constructor	
 	public void initStackLocation(int idx){  this.initStackLocation(idx, false);}	
 	public void initStackLocation(int idx, boolean clear){  s[idx].initMat(clear);}	
 	//add the current top of the matrix stack to the matrix stack in a higher position
-	public void push(){ top++; initStackLocation(top);  for (int row = 0; row < 4; row++){ for (int col = 0; col < 4; col++){  s[top].m[row][col] = s[top - 1].m[row][col]; }}}//push     	
+	public void push(){ ++top; initStackLocation(top);  for (int row = 0; row < 4; ++row){ for (int col = 0; col < 4; ++col){  s[top].m[row][col] = s[top - 1].m[row][col]; }}}//push     	
 	//replace the current top of the matrix stack with a new matrix
-	public void replaceTop(gtMatrix newTopMatrix){for (int row = 0; row < 4; row++){ for (int col = 0; col < 4; col++){ s[top].m[row][col] = newTopMatrix.m[row][col]; }}}//replaceTop	
+	public void replaceTop(myMatrix newTopMatrix){for (int row = 0; row < 4; ++row){ for (int col = 0; col < 4; ++col){ s[top].m[row][col] = newTopMatrix.m[row][col]; }}}//replaceTop	
 	//return the top of the matrix stack without popping
-	public gtMatrix peek(){ return s[top].clone();	}//peek	
+	public myMatrix peek(){ return s[top].clone();	}//peek	
 	//remove and return top matrix on stack
-	public gtMatrix pop(){
-		gtMatrix oldTop = new gtMatrix();
+	public myMatrix pop(){
+		myMatrix oldTop = new myMatrix();
 		oldTop = s[top].clone();
 		if (top > 0) {	top--;		initStackLocation(top+1,true);    }  //reinitialize stack			
 		else {		System.out.println("stack pop error");}

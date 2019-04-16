@@ -1,9 +1,6 @@
 package rayTracerDistAccelShdPhtnMap;
 
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -13,11 +10,15 @@ public class myRay{
 	public myScene scn;
 	public double[] currRfrIdx;
 	public double[] currKTrans;
+	
 	public myVector origin;  
 	public myVector direction;
+	
+	public double[] originAra;
+	public double[] dirAra;
 	//public double scale;
 	//for motion blur - ray has a time value
-	public double time;
+	private double time = -1;
 		
 	//what generation is this ray?  primary rays are 0, reflected rays increase generation by 1 for every reflection
 	public int gen;
@@ -35,18 +36,27 @@ public class myRay{
 	    }
 	    this.gen = _gen;
 	    this.origin = new myVector(_origin);
+	    this.originAra = this.origin.getAsAra();
 	    this.direction = new myVector(_direction);
 	    this.direction._normalize();
+	    this.dirAra = this.direction.getAsAra();
 	    //sorted list of all hits for this ray
 	    //scale = 1.0;
-	    
-	    this.time = ThreadLocalRandom.current().nextDouble(0,1.0);
+	    //for blur
+	    //this.time = ThreadLocalRandom.current().nextDouble(0,1.0);
 	}//myray constructor (5)
+	
+	public double getTime() {
+		if(time==-1) { time = ThreadLocalRandom.current().nextDouble(0,1.0);}
+		return time;
+	}
 	
 	//used by ray transformation of object's inv CTM
 	private void setRayVals(double[] originVals, double[] dirVals){
 	    this.origin.set(originVals[0],originVals[1],originVals[2]);
+	    this.originAra = this.origin.getAsAra();
 	    this.direction.set(dirVals[0],dirVals[1],dirVals[2]);
+	    this.dirAra = this.direction.getAsAra();
 	    //this.scale = this.direction._mag();
 	    //don't want to normalize direction when this is a transformed ray, or t's won't correspond properly 
 	    //^- normalizng here was the cause of the weird shadow edge on the concentric cube image
@@ -78,7 +88,7 @@ public class myRay{
 	//these are placed here for potential multi-threading - will pivot threads on rays
 	//this will apply the inverse of the current transformation matrix to the ray passed as a parameter and return the transformed ray
 	//pass correct matrix to use for transformation
-	public myRay getTransformedRay(myRay ray, gtMatrix trans){
+	public myRay getTransformedRay(myRay ray, myMatrix trans){
 		double[] rayOrigin,rayDirection;
 		ray.direction._normalize();
 		rayOrigin = trans.multVert(ray.origin.getAsHAraPt());
@@ -92,21 +102,21 @@ public class myRay{
 	}//getTransformedRay
 
 	//get transformed/inverse transformed point - homogeneous coords
-	public myVector getTransformedPt(myVector pt, gtMatrix trans){
+	public myVector getTransformedPt(myVector pt, myMatrix trans){
 		double[] newPtAra = trans.multVert(pt.getAsHAraPt());	
 		myVector newPt = new myVector(newPtAra[0],newPtAra[1],newPtAra[2]);
 		return newPt;
 	}
 	
 	//get transformed/inverse transformed vector - homogeneous coords
-	public myVector getTransformedVec(myVector vec, gtMatrix trans){
+	public myVector getTransformedVec(myVector vec, myMatrix trans){
 		double[] newVecAra = trans.multVert(vec.getAsHAraVec());		
 		myVector newVec = new myVector(newVecAra[0],newVecAra[1],newVecAra[2]);
 		return newVec;
 	}	
 	//build object for hit - contains all relevant info from intersection, including CTM matrix array
 	//args ara : idx 0 is cylinder stuff, idx 1 is bound box plane idx (0-5) args is used only in normal calc
-	public rayHit objHit(myGeomBase _obj, myVector _rawRayDir, gtMatrix[] _ctMtrx, myVector pt, int[] args, double _t){
+	public rayHit objHit(myGeomBase _obj, myVector _rawRayDir, myMatrix[] _ctMtrx, myVector pt, int[] args, double _t){
 		myVector fwdTransPt = getTransformedPt(pt, _ctMtrx[_obj.glblIDX]);		//hit location in world space		
 		myVector _newNorm = getTransformedVec(_obj.getNormalAtPoint(pt,args), _ctMtrx[_obj.adjIDX]);
 		_newNorm._normalize();
@@ -127,14 +137,14 @@ class rayHit implements Comparable<rayHit>{
 	public boolean isHit;
 	public double[] phtnPwr;
 	//ara of object hit by ray that this object represents 
-	public gtMatrix[] CTMara;
+	public myMatrix[] CTMara;
 	public final int 
 			glblIDX = 0,
 			invIDX = 1,
 			transIDX = 2,
 			adjIDX = 3;
 
-	public rayHit(myRay _tray, myVector _rawRayDir, myGeomBase _obj, gtMatrix[] _ctMtrx, myVector _objNorm, myVector _hitLoc, myVector _fwdTransHitLoc, double _t, int[] _iSectArgs){
+	public rayHit(myRay _tray, myVector _rawRayDir, myGeomBase _obj, myMatrix[] _ctMtrx, myVector _objNorm, myVector _hitLoc, myVector _fwdTransHitLoc, double _t, int[] _iSectArgs){
 		transRay = _tray;
 		isHit = true;
 		obj = _obj;
@@ -155,7 +165,7 @@ class rayHit implements Comparable<rayHit>{
 		t = Double.MAX_VALUE;
 	}
 	//enable recalculation of hit normal based on modified/updated CTMara
-	public void reCalcCTMHitNorm(gtMatrix[] _ctMtrx){
+	public void reCalcCTMHitNorm(myMatrix[] _ctMtrx){
 		CTMara = _ctMtrx;
 		fwdTransHitLoc = transRay.getTransformedPt(hitLoc, CTMara[glblIDX]);
 		myVector norm = obj.getNormalAtPoint(hitLoc,iSectArgs);

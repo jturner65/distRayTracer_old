@@ -16,7 +16,7 @@ public abstract class myGeomBase {
 	double[] trans_origin;		//used only to speed up initial calcs for bvh structure
 	public myObjShader shdr;
 
-	public gtMatrix[] CTMara;
+	public myMatrix[] CTMara;
 	public final int 
 			glblIDX = 0,
 			invIDX = 1,
@@ -52,9 +52,9 @@ public abstract class myGeomBase {
 	//return vector with minimum x/y/z coords of this object
 	public abstract myVector getMinVec();
 	//intersection check for shadows 
-	public abstract int calcShadowHit(myRay _ray,myRay _trans, gtMatrix[] _ctAra, double distToLight);
+	public abstract int calcShadowHit(myRay _ray,myRay _trans, myMatrix[] _ctAra, double distToLight);
 	//find rayhit value for hitting this geometry object
-	public abstract rayHit intersectCheck(myRay _ray,myRay transRay, gtMatrix[] _ctAra);
+	public abstract rayHit intersectCheck(myRay _ray,myRay transRay, myMatrix[] _ctAra);
 	//find the appropriate normal for the hit on this object
 	public abstract myVector getNormalAtPoint(myVector point, int[] args);
 	//everything should be able to handle a get color query
@@ -129,10 +129,10 @@ class myBBox extends myGeomBase {
 	public double[] findTxtrCoords(myVector isctPt, PImage myTexture, double time) {return new double[]{0,0};}
 	//only says if bbox is hit
 	@Override //_ctAra is ara of ctm for object held by bbox, and responsible for transformation of transray
-	public rayHit intersectCheck(myRay _ray,myRay transRay, gtMatrix[] _ctAra) {
+	public rayHit intersectCheck(myRay _ray,myRay transRay, myMatrix[] _ctAra) {
 		//iterate through first low and then high values
-		double[] rayO = transRay.origin.getAsAra(),//new double[]{transRay.origin.x,transRay.origin.y,transRay.origin.z},
-				rayD = transRay.direction.getAsAra(),//new double[]{transRay.direction.x,transRay.direction.y,transRay.direction.z},
+		double[] rayO = transRay.originAra,//new double[]{transRay.origin.x,transRay.origin.y,transRay.origin.z},
+				rayD = transRay.dirAra,//new double[]{transRay.direction.x,transRay.direction.y,transRay.direction.z},
 				minValsAra = minVals.getAsAra(), maxValsAra = maxVals.getAsAra(),
 				tmpVals1 = new double[]{-Double.MAX_VALUE,-1,-1},tmpVals2 = new double[]{-1,-1,-1},
 				tMinVals = new double[]{Double.MAX_VALUE,Double.MAX_VALUE,Double.MAX_VALUE}, tMaxVals = new double[]{-Double.MAX_VALUE,-Double.MAX_VALUE,-Double.MAX_VALUE};
@@ -163,7 +163,7 @@ class myBBox extends myGeomBase {
 	
 	//determine if shadow ray is a hit or not - returns if object bounded by box is a hit
 	@Override
-	public int calcShadowHit(myRay _ray,myRay _trans, gtMatrix[] _ctAra, double distToLight){		
+	public int calcShadowHit(myRay _ray,myRay _trans, myMatrix[] _ctAra, double distToLight){		
 		rayHit hitChk = intersectCheck(_ray,_trans,_ctAra);			
 		if (hitChk.isHit && (distToLight - hitChk.t) > scene.p.epsVal){	return 1;}   
 		return 0;
@@ -210,10 +210,10 @@ abstract class myAccelStruct extends myGeomBase{
 	@Override//myAccelStruct has no txtrs
 	public double[] findTxtrCoords(myVector isctPt, PImage myTexture, double time) {return new double[]{0,0};}
 	
-	protected abstract rayHit traverseStruct(myRay _ray,myRay _trans, gtMatrix[] _ctAra);
+	protected abstract rayHit traverseStruct(myRay _ray,myRay _trans, myMatrix[] _ctAra);
 
 	@Override
-	public rayHit intersectCheck(myRay _ray,myRay transRay, gtMatrix[] _ctAra) {	
+	public rayHit intersectCheck(myRay _ray,myRay transRay, myMatrix[] _ctAra) {	
 		//check first bbox and then traverse struct
 		rayHit bboxHit = _bbox.intersectCheck(_ray,transRay, _ctAra);
 		if(!bboxHit.isHit){return bboxHit;}
@@ -260,12 +260,12 @@ class myGeomList extends myAccelStruct{
 
 	public void addObj(myGeomBase _obj) {
 		objList.add(_obj);	
-		gtMatrix tmp = CTMara[invIDX].multMat(_obj.CTMara[glblIDX]);
+		myMatrix tmp = CTMara[invIDX].multMat(_obj.CTMara[glblIDX]);
 		//gtMatrix tmp = (_obj.CTMara[glblIDX]);
 		scene.p.expandBoxByBox(_bbox,_obj._bbox, tmp);
 	}
 	@Override  //check if object's contents block the light - check if any are accel structs or instance of accel struct
-	public int calcShadowHit(myRay _ray,myRay _trans, gtMatrix[] _ctAra, double distToLight) {
+	public int calcShadowHit(myRay _ray,myRay _trans, myMatrix[] _ctAra, double distToLight) {
 		if(_bbox.calcShadowHit( _ray, _trans, _ctAra, distToLight) == 0 ){return 0;}				//no hit of bounding box, then no hit 	
 		myRay _objTransRay;
 		for (myGeomBase obj : objList){
@@ -278,7 +278,7 @@ class myGeomList extends myAccelStruct{
 	
 	//build traversal based on _ray - go through all objects in structure
 	@Override
-	public rayHit traverseStruct(myRay _ray,myRay _trans, gtMatrix[] _ctAra){	
+	public rayHit traverseStruct(myRay _ray,myRay _trans, myMatrix[] _ctAra){	
 		double _clsT = Double.MAX_VALUE;
 		rayHit _clsHit = null;
 		myRay _objTransRay, _closestTransRay = null;
@@ -394,7 +394,7 @@ class myBVH extends myAccelStruct{
 //	}//addObj
 //	
 	@Override
-	public int calcShadowHit(myRay _ray, myRay _trans, gtMatrix[] _ctAra, double distToLight) {
+	public int calcShadowHit(myRay _ray, myRay _trans, myMatrix[] _ctAra, double distToLight) {
 		if(isLeaf){return leafVals.calcShadowHit(_ray,_trans, _ctAra, distToLight);}
 		int leftRes = leftChild._bbox.calcShadowHit(_ray,_trans, _ctAra, distToLight);
 		if((leftRes == 1) && leftChild.calcShadowHit(_ray,_trans, _ctAra, distToLight) == 1){return 1;}
@@ -404,15 +404,15 @@ class myBVH extends myAccelStruct{
 	}//calcShadowHit	
 	
 	@Override
-	public rayHit traverseStruct(myRay _ray,myRay _trans, gtMatrix[] _ctAra){
+	public rayHit traverseStruct(myRay _ray,myRay _trans, myMatrix[] _ctAra){
 		if(isLeaf){return leafVals.traverseStruct(_ray,_trans, _ctAra);}		
-		rayHit _hit = leftChild._bbox.intersectCheck(_ray,_trans,_ctAra),
-				_hit2 = rightChild._bbox.intersectCheck(_ray,_trans,_ctAra);
+		rayHit _hit = leftChild._bbox.intersectCheck(_ray,_trans,_ctAra);
 //		int dpthToEnd = 18;
 //		if((_hit.isHit) && (this.treedepth < dpthToEnd)){
 		if(_hit.isHit){
 			_hit = leftChild.traverseStruct(_ray,_trans, _ctAra);
 		}
+		rayHit _hit2 = rightChild._bbox.intersectCheck(_ray,_trans,_ctAra);
 //		if((_hit2.isHit) && (this.treedepth < dpthToEnd) && (!_hit.isHit || (_hit2.t < _hit.t))){
 		if((_hit2.isHit) && (!_hit.isHit || (_hit2.t < _hit.t))){
 			_hit2 = rightChild.traverseStruct(_ray,_trans, _ctAra);

@@ -1,6 +1,6 @@
 package rayTracerDistAccelShdPhtnMap;
 
-import java.util.ArrayDeque;
+import java.util.*;
 
 import processing.core.PApplet;
 
@@ -60,7 +60,7 @@ public class myRTFileReader {
 			    case "lens" : { 			//for depth of field -only in FOV scenes - specifies the lens size (radius) and what distance in front of the eye is in focus - greater radius should blur more of the image
 			    	double radius = Double.parseDouble(token[1]);
 			    	double focal_distance = Double.parseDouble(token[2]);
-			    	scene.setDoF(radius, focal_distance);			    	
+			    	scene.setDpthOfFld(radius, focal_distance);			    	
 			    	break;}
 			    
 				case "fishEye" :
@@ -153,7 +153,8 @@ public class myRTFileReader {
 				case "point_light" : {
 					scene.addMyPointLight(token);	      
 					break;}
-				case "spotlight" : {//spotlight x y z dx dy dz angle_inner angle_outer r g b				
+				case "spotlight" : {//spotlight x y z dx dy dz angle_inner angle_outer r g b
+					System.out.println("File : " + fileName+ " has a spotLight!");
 					scene.addMySpotLight(token);   
 					break;}				
 				case "disk_light" : {//disk_light x y z radius dx dy dz r g b

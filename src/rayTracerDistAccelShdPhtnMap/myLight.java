@@ -30,11 +30,11 @@ public abstract class myLight extends mySceneObject{
 	}	
 	@Override
 	//assumes that transRay dir is toward light.
-	public rayHit intersectCheck(myRay _ray, myRay transRay, gtMatrix[] _ctAra){  
+	public rayHit intersectCheck(myRay _ray, myRay transRay, myMatrix[] _ctAra){  
 		myVector hitNorm = new myVector(transRay.direction);
 		hitNorm._mult(-1);//norm is just neg ray direction
 		hitNorm._normalize();
-		double t = transRay.origin._dist(getOrigin(transRay.time));
+		double t = transRay.origin._dist(getOrigin(transRay.getTime()));
 		rayHit hit = transRay.objHit(this, _ray.direction, _ctAra, transRay.pointOnRay(t), new int[]{}, t);
 		//rayHit hit = new rayHit(transRay, _ray.direction, this, _ctAra, hitNorm,transRay.pointOnRay(t),t, new int[]{});		
 		return hit;
@@ -57,7 +57,9 @@ public abstract class myLight extends mySceneObject{
 	}
 	//get a random direction for a photon to travel - from jensen photon mapping
 	public myVector getRandDir(){
-		double x,y,z, sqmag;
+		double x,y,z, sqmag, mag;
+		
+		//replace this with better random randomizer
 		do{
 			x = ThreadLocalRandom.current().nextDouble(-1.0,1.0);
 			y = ThreadLocalRandom.current().nextDouble(-1.0,1.0);
@@ -65,12 +67,13 @@ public abstract class myLight extends mySceneObject{
 			sqmag = (x*x) + (y*y) + (z*z);
 		}
 		while ((sqmag > 1.0) || (sqmag < scene.p.epsVal));
-		myVector res = new myVector(x,y,z);
-		res._normalize();
+		mag=Math.sqrt(sqmag);
+		myVector res = new myVector(x/mag,y/mag,z/mag);
+		//res._normalize();
 		return res;
 	}
 	
-	//probability/weighting of angle between inner and outer radii
+	//probability/weighting of angle between inner and outer radii - linear
 	protected double getAngleProb(double angle, double innerThetRad, double outerThetRad, double radDiff){return (angle < innerThetRad ) ? 1 : (angle > outerThetRad ) ? 0 : (outerThetRad - angle)/radDiff;}	
 	//send direction vector, finds multiplier for penumbra effect
 	protected double calcT_Mult(myVector dir, double time, double innerThetRad, double outerThetRad, double radDiff){
@@ -153,9 +156,9 @@ class mySpotLight extends myLight{
 		oPhAxis = scene.p.getOrthoVec(orientation);			//for rotation of dir vector for generating photons
 	}//setSpotlightVals	
 	@Override
-	public rayHit intersectCheck(myRay _ray, myRay transRay, gtMatrix[] _ctAra){  
+	public rayHit intersectCheck(myRay _ray, myRay transRay, myMatrix[] _ctAra){  
 		rayHit hit = super.intersectCheck(_ray, transRay, _ctAra);
-		hit.ltMult = calcT_Mult(transRay.direction,transRay.time, innerThetRad, outerThetRad, radDiff);
+		hit.ltMult = calcT_Mult(transRay.direction,transRay.getTime(), innerThetRad, outerThetRad, radDiff);
 		return hit;
 	}
 	@Override
@@ -163,10 +166,16 @@ class mySpotLight extends myLight{
 		//find random unit vector at some angle from orientation < outerThetRad, scale pwr of photon by t for angle >innerThetRad, <outerThetRad 
 		myVector tmp = new myVector();
 		double prob, angle;
+		
+		//as per CLT this should approach gaussian
+		double checkProb = ThreadLocalRandom.current().nextDouble(0,1);
 		do{//penumbra isn't as likely
 			angle = ThreadLocalRandom.current().nextDouble(0,outerThetRad);
 			prob = getAngleProb(angle, innerThetRad, outerThetRad, radDiff);			
-		} while (prob > ThreadLocalRandom.current().nextDouble(0,1));
+		//} while (prob > ThreadLocalRandom.current().nextDouble(0,1));
+		} while (prob > checkProb);
+		
+		
 		tmp.set(scene.p.rotVecAroundAxis(orientation,oPhAxis,angle));	
 		tmp._normalize();
 		//rotate in phi dir for random direction

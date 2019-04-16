@@ -1,10 +1,8 @@
 package rayTracerDistAccelShdPhtnMap;
 
-import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.*;
 
 import processing.core.PConstants;
-import processing.core.PImage;
 
 public class myObjShader {
 	public myScene scene;
@@ -113,7 +111,7 @@ public class myObjShader {
   			//uncomment below for instances of bvh - need to fix this TODO
   			//lightNorm.set(hit.transRay.getTransformedPt(hit.transRay.getTransformedPt(light.getOrigin(hit.transRay.time),light.CTMara[light.glblIDX]), hit.CTMara[hit.obj.invIDX]));		
   			//comment below for instances of bvh - need to fix this TODO  			
-  			lightNorm.set(hit.transRay.getTransformedPt(light.getOrigin(hit.transRay.time),light.CTMara[light.glblIDX]));		
+  			lightNorm.set(hit.transRay.getTransformedPt(light.getOrigin(hit.transRay.getTime()),light.CTMara[light.glblIDX]));		
   			lightNorm._sub(hitLoc);				//this is point on transformed ray 
   			lightNorm._normalize();
   			//to calculate shadows at this spot, need to check for intersections again making a new ray out of light norm

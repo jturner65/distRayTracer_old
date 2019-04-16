@@ -1,6 +1,6 @@
 package rayTracerDistAccelShdPhtnMap;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import processing.core.PImage;
 
@@ -101,7 +101,7 @@ public abstract class myPlanarObject extends mySceneObject{
 
 	@Override
 	//check if passed ray intersects with this planar object - ray already transformed	
-	public rayHit intersectCheck(myRay _ray, myRay transRay, gtMatrix[] _ctAra){
+	public rayHit intersectCheck(myRay _ray, myRay transRay, myMatrix[] _ctAra){
 //		if(!_bbox.intersectCheck(ray, _ctAra).isHit){return new rayHit(false);	}
 //		myRay transRay = ray.getTransformedRay(ray, _ctAra[invIDX]);
 		//get the result of plugging in this ray's direction term with the plane in question - if 0 then this ray is parallel with the plane
