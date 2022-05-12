@@ -29,7 +29,7 @@ public class myVector{
 	
 	public void _normalize(){double magn = _mag();if(magn == 0){return;} _div(magn);}
 	
-	public myVector _normalized(){double magn = this._mag(); myVector newVec = (magn == 0) ? (new myVector(0,0,0)) : (new myVector( this.x /= magn, this.y /= magn, this.z /= magn)); newVec._mag(); return newVec;}
+	public myVector _normalized(){double magn = this._mag(); myVector newVec = (magn == 0) ? (new myVector(0,0,0)) : (new myVector( this.x / magn, this.y / magn, this.z / magn)); newVec._mag(); return newVec;}
 
 	public myVector cloneMe(){myVector retVal = new myVector(this.x, this.y, this.z); retVal._mag(); return retVal;}  
 	
