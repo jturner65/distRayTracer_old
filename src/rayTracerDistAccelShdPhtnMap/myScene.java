@@ -1043,7 +1043,7 @@ public abstract class myScene {
 								sqmag = (x*x) + (y*y);
 							}
 							while ((sqmag >= 1.0) || (sqmag < p.epsVal));
-							z = Math.sqrt(1 - ((x*x) + (y*y)));							//cosine weighting preserved by projecting up to sphere
+							z = Math.sqrt(1 - (sqmag));							//cosine weighting preserved by projecting up to sphere
 					  		//then build ortho basis from normal - n' , q' , r' 
 					  		myVector n = new myVector(hitChk.objNorm),_p = new myVector(),_q = new myVector(); 
 					  				//tmpV = (((n.x > n.y) && (n.x > n.z)) || ((-n.x > -n.y) && (-n.x > -n.z))  ? new myVector(0,0,1)  : new myVector(1,0,0));//find vector not close to n or -n to use to find tangent
