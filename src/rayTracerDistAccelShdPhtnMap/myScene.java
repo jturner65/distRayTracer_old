@@ -393,12 +393,12 @@ public abstract class myScene {
 	//remove most recent object from list of objects and instead add to instance object struct.
 	public void setObjectAsNamedObject(String name){
 		myGeomBase _obj = allObjsToFind.remove(allObjsToFind.size()-1);
-		objCount--;
+		--objCount;
 		if(_obj instanceof myLight){												lightList.remove(lightList.size()-1);	numLights--;	} 
 		else { 																		objList.remove(objList.size()-1); 		numNonLights--;	}	
 		namedObjs.put(name, _obj);
 		numInstances.put(name, 0);			//keep count of specific instances
-		numNamedObjs++;
+		++numNamedObjs;
 	}//setObjectAsNamedObject
 	
 	public void addInstance(String name, boolean addShdr){
